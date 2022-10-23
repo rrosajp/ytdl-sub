@@ -17,12 +17,14 @@ class XmlElement:
         -------
         Only the tag if no attributes, otherwise a dict containing both attributes and the tag
         """
-        if not self.attributes:
-            return self.text
-        return {
-            "attributes": self.attributes,
-            "tag": self.text,
-        }
+        return (
+            {
+                "attributes": self.attributes,
+                "tag": self.text,
+            }
+            if self.attributes
+            else self.text
+        )
 
 
 def _to_max_3_byte_utf8_char(char: str) -> str:

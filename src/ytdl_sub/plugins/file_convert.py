@@ -79,9 +79,8 @@ class FileConvertPlugin(Plugin[FileConvertOptions]):
         """
         new_ext = self.plugin_options.convert_to
         converted_video_file = entry.get_download_file_path().removesuffix(entry.ext) + new_ext
-        if not self.is_dry_run:
-            if not os.path.isfile(converted_video_file):
-                raise FileNotDownloadedException("Failed to find the converted video file")
+        if not self.is_dry_run and not os.path.isfile(converted_video_file):
+            raise FileNotDownloadedException("Failed to find the converted video file")
 
         if entry.ext != new_ext:
             entry.add_kwargs(

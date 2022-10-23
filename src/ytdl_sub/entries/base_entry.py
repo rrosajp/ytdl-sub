@@ -265,7 +265,7 @@ class BaseEntry(BaseEntryVariables, ABC):
         ValueError
             If a variable trying to be added already exists as a source variable
         """
-        for variable_name in variables_to_add.keys():
+        for variable_name in variables_to_add:
             if self.kwargs_contains(variable_name):
                 raise ValueError(
                     f"Cannot add variable '{variable_name}': already exists in the kwargs"
@@ -305,8 +305,7 @@ class BaseEntry(BaseEntryVariables, ABC):
         -------
         List of all source variables
         """
-        property_names = [prop for prop in dir(cls) if isinstance(getattr(cls, prop), property)]
-        return property_names
+        return [prop for prop in dir(cls) if isinstance(getattr(cls, prop), property)]
 
     @final
     def to_dict(self) -> Dict[str, str]:

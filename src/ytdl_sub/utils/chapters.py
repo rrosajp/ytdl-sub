@@ -116,7 +116,7 @@ class Timestamp:
         if len(hour_minute_second) != 3:
             raise ValueError("Youtube timestamp must be in the form of 'HH:MM:SS'")
 
-        hour, minute, second = tuple(x for x in hour_minute_second)
+        hour, minute, second = tuple(hour_minute_second)
         try:
             return cls(timestamp_sec=(int(hour) * 3600) + (int(minute) * 60) + int(second))
         except ValueError as cast_exception:
@@ -212,7 +212,7 @@ class Chapters:
                     f"must be in the format of 'HH:MM:SS title"
                 )
 
-            timestamp_str, title = tuple(x for x in line_split)
+            timestamp_str, title = tuple(line_split)
 
             timestamps.append(Timestamp.from_str(timestamp_str))
             titles.append(title)

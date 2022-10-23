@@ -80,9 +80,10 @@ class ExpectedDownloads:
 
     @classmethod
     def from_dict(cls, expected_downloads_dict) -> "ExpectedDownloads":
-        expected_downloads: List[ExpectedDownloadFile] = []
-        for file_path, md5_hash in expected_downloads_dict.items():
-            expected_downloads.append(ExpectedDownloadFile(path=Path(file_path), md5=md5_hash))
+        expected_downloads: List[ExpectedDownloadFile] = [
+            ExpectedDownloadFile(path=Path(file_path), md5=md5_hash)
+            for file_path, md5_hash in expected_downloads_dict.items()
+        ]
 
         return cls(expected_downloads=expected_downloads)
 
@@ -122,8 +123,9 @@ def assert_expected_downloads(
     if dry_run:
         output_directory_contents = list(Path(output_directory).rglob("*"))
         assert (
-            len(output_directory_contents) == 0
+            not output_directory_contents
         ), f"Expected output directory to be empty after a dry-run, but found {output_directory_contents}"
+
         return
 
     summary_full_path = _EXPECTED_DOWNLOADS_SUMMARY_PATH / expected_download_summary_file_name

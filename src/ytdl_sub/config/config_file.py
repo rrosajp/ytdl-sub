@@ -68,9 +68,7 @@ class ConfigOptions(StrictDictValidator):
 
            ytdl-sub dl --mv --v "youtube.com/watch?v=a1b2c3"
         """
-        if self._dl_aliases:
-            return self._dl_aliases.dict
-        return {}
+        return self._dl_aliases.dict if self._dl_aliases else {}
 
 
 class ConfigFile(StrictDictValidator):

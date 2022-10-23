@@ -82,11 +82,13 @@ class YoutubePlaylistUrlValidator(StringValidator):
             url = f"https://{url}"
 
         query = urlparse(url)
-        if query.hostname in ("youtube.com", "www.youtube.com"):
-            if query.path == "/playlist":
-                parsed_q = parse_qs(query.query)
-                if "list" in parsed_q:
-                    return parsed_q["list"][0]
+        if (
+            query.hostname in ("youtube.com", "www.youtube.com")
+            and query.path == "/playlist"
+        ):
+            parsed_q = parse_qs(query.query)
+            if "list" in parsed_q:
+                return parsed_q["list"][0]
 
         return None
 
@@ -179,11 +181,13 @@ class SoundcloudUsernameUrlValidator(StringValidator):
             url = f"https://{url}"
 
         query = urlparse(url)
-        if query.hostname in ("soundcloud.com", "www.soundcloud.com"):
-            if len(query.path) > 2:  # /artist_name
-                username = query.path[1:].split("/")[0]  # strip extra paths or slashes
-                username = username.split("?")[0]  # strip extra arguments
-                return f"https://soundcloud.com/{username}"
+        if (
+            query.hostname in ("soundcloud.com", "www.soundcloud.com")
+            and len(query.path) > 2
+        ):
+            username = query.path[1:].split("/")[0]  # strip extra paths or slashes
+            username = username.split("?")[0]  # strip extra arguments
+            return f"https://soundcloud.com/{username}"
 
         return None
 

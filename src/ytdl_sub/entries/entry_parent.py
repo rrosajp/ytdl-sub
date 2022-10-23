@@ -102,15 +102,18 @@ class EntryParent(BaseEntry):
         return [getattr(entry_child, variable_name) for entry_child in self.entry_children()]
 
     def _entry_aggregate_variables(self) -> Dict:
-        if not self.entry_children():
-            return {}
-
-        return {
-            PLAYLIST_MAX_UPLOAD_YEAR: max(self._get_entry_children_variable_list("upload_year")),
-            PLAYLIST_MAX_UPLOAD_YEAR_TRUNCATED: max(
-                self._get_entry_children_variable_list("upload_year_truncated")
-            ),
-        }
+        return (
+            {
+                PLAYLIST_MAX_UPLOAD_YEAR: max(
+                    self._get_entry_children_variable_list("upload_year")
+                ),
+                PLAYLIST_MAX_UPLOAD_YEAR_TRUNCATED: max(
+                    self._get_entry_children_variable_list("upload_year_truncated")
+                ),
+            }
+            if self.entry_children()
+            else {}
+        )
 
     # pylint: disable=protected-access
 
@@ -178,10 +181,14 @@ class EntryParent(BaseEntry):
         -------
         Desired thumbnail url if it exists. None if it does not.
         """
-        for thumbnail in self.kwargs_get("thumbnails", []):
-            if thumbnail["id"] == thumbnail_id:
-                return thumbnail["url"]
-        return None
+        return next(
+            (
+                thumbnail["url"]
+                for thumbnail in self.kwargs_get("thumbnails", [])
+                if thumbnail["id"] == thumbnail_id
+            ),
+            None,
+        )
 
     def __contains__(self, item: Dict | BaseEntry) -> bool:
         playlist_id: Optional[str] = None
@@ -190,11 +197,11 @@ class EntryParent(BaseEntry):
         elif isinstance(item, BaseEntry):
             playlist_id = item.kwargs_get("playlist_id")
 
-        if not playlist_id:
-            return False
-
-        return self.uid == playlist_id or any(
-            child.__contains__(item) for child in self.child_entries
+        return (
+            self.uid == playlist_id
+            or any(child.__contains__(item) for child in self.child_entries)
+            if playlist_id
+            else False
         )
 
     @classmethod

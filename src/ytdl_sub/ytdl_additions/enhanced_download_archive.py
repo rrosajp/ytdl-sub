@@ -310,9 +310,10 @@ class DownloadMappings:
         A DownloadArchive created from the DownloadMappings' ids and extractors. YTDL will use this
         to avoid redownloading entries already downloaded.
         """
-        lines: List[str] = []
-        for entry_id, metadata in self._entry_mappings.items():
-            lines.append(f"{metadata.extractor} {entry_id}")
+        lines: List[str] = [
+            f"{metadata.extractor} {entry_id}"
+            for entry_id, metadata in self._entry_mappings.items()
+        ]
 
         return DownloadArchive(download_archive_lines=lines)
 

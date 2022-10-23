@@ -75,11 +75,8 @@ class TestPrebuiltTVShowPresets:
         tv_show_structure_preset: str,
         is_youtube_channel: bool,
     ):
-        expected_summary_name = "unit/{}/{}/is_yt_{}".format(
-            media_player_preset,
-            tv_show_structure_preset,
-            int(is_youtube_channel),
-        )
+        expected_summary_name = f"unit/{media_player_preset}/{tv_show_structure_preset}/is_yt_{int(is_youtube_channel)}"
+
         parent_presets = [media_player_preset, tv_show_structure_preset]
 
         subscription = Subscription.from_dict(
@@ -180,12 +177,8 @@ class TestPrebuiltTvShowCollectionPresets:
         season_indices: List[int],
         is_youtube_channel: bool,
     ):
-        expected_summary_name = "unit/{}/{}/s_{}/is_yt_{}".format(
-            media_player_preset,
-            tv_show_structure_preset,
-            len(season_indices),
-            int(is_youtube_channel),
-        )
+        expected_summary_name = f"unit/{media_player_preset}/{tv_show_structure_preset}/s_{len(season_indices)}/is_yt_{int(is_youtube_channel)}"
+
         parent_presets: List[str] = [media_player_preset, tv_show_structure_preset]
 
         overrides: Dict[str, str] = {}

@@ -44,8 +44,7 @@ class FFMPEG:
         """
         cls._ensure_installed()
 
-        cmd = ["ffmpeg"]
-        cmd.extend(ffmpeg_args)
+        cmd = ["ffmpeg", *ffmpeg_args]
         logger.debug("Running %s", " ".join(cmd))
         with Logger.handle_external_logs(name="ffmpeg"):
             subprocess.run(cmd, check=True, capture_output=True)

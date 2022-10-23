@@ -142,11 +142,7 @@ class TestDownloadArgsParser:
             cmd_string="dl --parameter.using.list 'v2' --parameter.using.list[1] 'v1'"
         )
 
-        with pytest.raises(
-            InvalidDlArguments,
-            match=f"Invalid dl argument --parameter.using.list: "
-            "Cannot specify an argument to be two different types",
-        ):
+        with pytest.raises(InvalidDlArguments, match='Invalid dl argument --parameter.using.list: Cannot specify an argument to be two different types'):
             DownloadArgsParser(
                 extra_arguments=extra_args, config_options=config_options
             ).to_subscription_dict()

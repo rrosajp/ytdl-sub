@@ -16,16 +16,10 @@ def to_date_range(
     -------
     Date range if the 'before' or 'after' is defined. None otherwise.
     """
-    start: Optional[str] = None
     end: Optional[str] = None
 
-    if after:
-        start = overrides.apply_formatter(formatter=after)
-
+    start = overrides.apply_formatter(formatter=after) if after else None
     if before:
         end = overrides.apply_formatter(formatter=before)
 
-    if start or end:
-        return DateRange(start=start, end=end)
-
-    return None
+    return DateRange(start=start, end=end) if start or end else None
