@@ -48,9 +48,7 @@ class AudioExtractOptions(PluginOptions):
         Optional. Specify ffmpeg audio quality. Insert a value between ``0`` (better) and ``9``
         (worse) for variable bitrate, or a specific bitrate like ``128`` for 128k.
         """
-        if self._quality is not None:
-            return self._quality.value
-        return None
+        return self._quality.value if self._quality is not None else None
 
 
 class AudioExtractPlugin(Plugin[AudioExtractOptions]):
@@ -96,9 +94,8 @@ class AudioExtractPlugin(Plugin[AudioExtractOptions]):
         """
         new_ext = AUDIO_CODEC_TYPES_EXTENSION_MAPPING[self.plugin_options.codec]
         extracted_audio_file = entry.get_download_file_path().removesuffix(entry.ext) + new_ext
-        if not self.is_dry_run:
-            if not os.path.isfile(extracted_audio_file):
-                raise FileNotDownloadedException("Failed to find the extracted audio file")
+        if not self.is_dry_run and not os.path.isfile(extracted_audio_file):
+            raise FileNotDownloadedException("Failed to find the extracted audio file")
 
         entry.add_kwargs({"ext": new_ext})
 

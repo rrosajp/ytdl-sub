@@ -61,7 +61,7 @@ class RegexListValidator(ListValidator[RegexValidator]):
     def __init__(self, name, value):
         super().__init__(name, value)
 
-        if len(set(reg.num_capture_groups for reg in self._list)) > 1:
+        if len({reg.num_capture_groups for reg in self._list}) > 1:
             raise self._validation_exception(
                 "each regex in a list must have the same number of capture groups"
             )

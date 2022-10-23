@@ -120,12 +120,11 @@ class SubscriptionDownload(BaseSubscription, ABC):
         # If output options maintains stale file deletion, perform the delete here prior to saving
         # the download archive
         if self.maintain_download_archive:
-            date_range_to_keep = to_date_range(
+            if date_range_to_keep := to_date_range(
                 before=self.output_options.keep_files_before,
                 after=self.output_options.keep_files_after,
                 overrides=self.overrides,
-            )
-            if date_range_to_keep:
+            ):
                 self._enhanced_download_archive.remove_stale_files(date_range=date_range_to_keep)
 
             self._enhanced_download_archive.save_download_mappings()
@@ -161,8 +160,7 @@ class SubscriptionDownload(BaseSubscription, ABC):
     ):
         # Post-process the entry with all plugins
         for plugin in sorted(plugins, key=lambda _plugin: _plugin.priority.post_process):
-            optional_plugin_entry_metadata = plugin.post_process_entry(entry)
-            if optional_plugin_entry_metadata:
+            if optional_plugin_entry_metadata := plugin.post_process_entry(entry):
                 entry_metadata.extend(optional_plugin_entry_metadata)
 
         # Then, move it to the output directory

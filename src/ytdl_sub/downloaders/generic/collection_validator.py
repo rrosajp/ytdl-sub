@@ -136,7 +136,7 @@ class CollectionUrlListValidator(ListValidator[CollectionUrlValidator]):
                     )
 
             # see if this collection is missing any added vars (if so, inherit from the top)
-            for var in added_variables.keys():
+            for var in added_variables:
                 if var not in collection_variables.keys():
                     collection_variables[var] = added_variables[var]
 

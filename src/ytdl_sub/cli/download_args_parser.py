@@ -165,8 +165,7 @@ class DownloadArgsParser:
             argument_name, list_index = cls._get_list_index_if_exists(argument_name=argument_name)
 
             if list_index == -1:
-                new_arguments.append(argument_name)
-                new_arguments.append(argument_value)
+                new_arguments.extend((argument_name, argument_value))
                 continue
 
             if argument_name not in list_arguments:
@@ -187,9 +186,7 @@ class DownloadArgsParser:
                 if idx < list_length:
                     list_value[idx] = value
 
-            new_arguments.append(name)
-            new_arguments.append(list_value)
-
+            new_arguments.extend((name, list_value))
         return new_arguments
 
     def to_subscription_dict(self) -> Dict:

@@ -246,12 +246,10 @@ class Downloader(DownloadArchiver, Generic[DownloaderOptionsT], ABC):
                 is_thumbnail_downloaded_fn is None or is_thumbnail_downloaded_fn()
             )
 
-            if is_downloaded and is_thumbnail_downloaded:
-                return entry_dict
+            if is_downloaded:
+                if is_thumbnail_downloaded:
+                    return entry_dict
 
-            # If the video file is downloaded but the thumbnail is not, then do not download
-            # the video again
-            if is_downloaded and not is_thumbnail_downloaded:
                 copied_ytdl_options_overrides["skip_download"] = True
                 copied_ytdl_options_overrides["writethumbnail"] = True
 
@@ -472,13 +470,10 @@ class Downloader(DownloadArchiver, Generic[DownloaderOptionsT], ABC):
             self._mark_downloaded(entry)
 
     def _download_parent_entry(self, parent: EntryParent) -> Generator[Entry, None, None]:
-        for entry_child in self._download_entries(parent.entry_children()):
-            yield entry_child
-
+        yield from self._download_entries(parent.entry_children())
         # Recursion the parent's parent entries
         for parent_child in reversed(parent.parent_children()):
-            for entry_child in self._download_parent_entry(parent=parent_child):
-                yield entry_child
+            yield from self._download_parent_entry(parent=parent_child)
 
     def _set_collection_variables(
         self, collection_url: CollectionUrlValidator, entry: Entry | EntryParent
@@ -541,11 +536,8 @@ class Downloader(DownloadArchiver, Generic[DownloaderOptionsT], ABC):
         # Delete info json files afterwards so other collection URLs do not use them
         with self._separate_download_archives(clear_info_json_files=True):
             for parent in parents:
-                for entry_child in self._download_parent_entry(parent=parent):
-                    yield entry_child
-
-            for orphan in self._download_entries(orphans):
-                yield orphan
+                yield from self._download_parent_entry(parent=parent)
+            yield from self._download_entries(orphans)
 
     def download(
         self,
@@ -584,11 +576,13 @@ class Downloader(DownloadArchiver, Generic[DownloaderOptionsT], ABC):
         -------
         True if the thumbnail converted. None if it is missing or failed.
         """
-        if not thumbnail_url:
-            return None
-
-        return convert_url_thumbnail(
-            thumbnail_url=thumbnail_url, output_thumbnail_path=output_thumbnail_path
+        return (
+            convert_url_thumbnail(
+                thumbnail_url=thumbnail_url,
+                output_thumbnail_path=output_thumbnail_path,
+            )
+            if thumbnail_url
+            else None
         )
 
     def _download_parent_thumbnails(

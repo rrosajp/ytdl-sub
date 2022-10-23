@@ -115,14 +115,14 @@ class SoundcloudAlbumsAndSinglesDownloader(Downloader[SoundcloudAlbumsAndSingles
         )
 
     def _should_skip(self, entry: Entry) -> bool:
-        if not self.download_options.skip_premiere_tracks:
-            return False
-
-        for url in [entry.kwargs_get("url", ""), entry.webpage_url]:
-            if "/preview/" in url:
-                return True
-
-        return False
+        return (
+            any(
+                "/preview/" in url
+                for url in [entry.kwargs_get("url", ""), entry.webpage_url]
+            )
+            if self.download_options.skip_premiere_tracks
+            else False
+        )
 
     def download(self) -> Generator[Entry, None, None]:
         """

@@ -24,9 +24,7 @@ class Entry(EntryVariables, BaseEntry):
         otherwise, return the original extension.
         """
         mkv_file_path = str(Path(self.working_directory()) / f"{self.uid}.mkv")
-        if os.path.isfile(mkv_file_path):
-            return "mkv"
-        return super().ext
+        return "mkv" if os.path.isfile(mkv_file_path) else super().ext
 
     def get_download_file_name(self) -> str:
         """

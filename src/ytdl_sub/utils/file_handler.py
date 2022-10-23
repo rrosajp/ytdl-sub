@@ -38,13 +38,15 @@ def files_equal(full_file_path_a: Path | str, full_file_path_b: Path | str) -> b
     -------
     True if the files are equal in contents. False otherwise.
     """
-    if not (os.path.isfile(full_file_path_a) and os.path.isfile(full_file_path_b)):
+    if not os.path.isfile(full_file_path_a) or not os.path.isfile(
+        full_file_path_b
+    ):
         return False
     if os.path.getsize(full_file_path_a) != os.path.getsize(full_file_path_b):
         return False
-    if get_file_md5_hash(full_file_path_a) != get_file_md5_hash(full_file_path_b):
-        return False
-    return True
+    return get_file_md5_hash(full_file_path_a) == get_file_md5_hash(
+        full_file_path_b
+    )
 
 
 class FileMetadata:
@@ -115,9 +117,7 @@ class FileMetadata:
                 return _single_value(value=value[0])
             if isinstance(value, (dict, list)):
                 return None
-            if isinstance(value, str) and "\n" in value:
-                return None
-            return value
+            return None if isinstance(value, str) and "\n" in value else value
 
         def _recursive_lines(value: Any, indent: int = 0) -> str:
             _indent = " " * indent
@@ -426,9 +426,7 @@ class FileHandler:
             File in the output directory to delete
         """
         file_path = Path(self.output_directory) / file_name
-        exists = os.path.isfile(file_path)
-
-        if exists:
+        if exists := os.path.isfile(file_path):
             self._file_handler_transaction_log.log_removed_file(file_name)
             if not self.dry_run:
                 self.delete(file_path=file_path)

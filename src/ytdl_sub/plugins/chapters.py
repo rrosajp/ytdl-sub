@@ -276,9 +276,12 @@ class ChaptersPlugin(Plugin[ChaptersOptions]):
     def _get_removed_chapters(self, entry: Entry) -> List[str]:
         removed_chapters: List[str] = []
         for pattern in self.plugin_options.remove_chapters_regex or []:
-            for chapter in _chapters(entry):
-                if pattern.search(chapter["title"]):
-                    removed_chapters.append(chapter["title"])
+            removed_chapters.extend(
+                chapter["title"]
+                for chapter in _chapters(entry)
+                if pattern.search(chapter["title"])
+            )
+
         return removed_chapters
 
     def _get_removed_sponsorblock_category_counts(self, entry: Entry) -> Dict:

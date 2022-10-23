@@ -34,7 +34,7 @@ def convert_download_thumbnail(entry: Entry, error_if_not_found: bool = True) ->
             raise ValueError("Thumbnail not found")
         return
 
-    if not download_thumbnail_path == download_thumbnail_path_as_jpg:
+    if download_thumbnail_path != download_thumbnail_path_as_jpg:
         FFMPEG.run(["-bitexact", "-i", download_thumbnail_path, download_thumbnail_path_as_jpg])
 
 

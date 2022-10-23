@@ -35,10 +35,14 @@ class SubscriptionYTDLOptions:
         self._dry_run = dry_run
 
     def _get_plugin(self, plugin_type: Type[PluginT]) -> Optional[PluginT]:
-        for plugin in self._plugins:
-            if isinstance(plugin, plugin_type):
-                return plugin
-        return None
+        return next(
+            (
+                plugin
+                for plugin in self._plugins
+                if isinstance(plugin, plugin_type)
+            ),
+            None,
+        )
 
     @property
     def _downloader(self) -> Type[Downloader]:
@@ -85,10 +89,11 @@ class SubscriptionYTDLOptions:
         return ytdl_options
 
     def _plugin_ytdl_options(self, plugin: Type[PluginT]) -> Dict:
-        if not (audio_extract_plugin := self._get_plugin(plugin)):
-            return {}
-
-        return audio_extract_plugin.ytdl_options()
+        return (
+            audio_extract_plugin.ytdl_options()
+            if (audio_extract_plugin := self._get_plugin(plugin))
+            else {}
+        )
 
     @property
     def _user_ytdl_options(self) -> Dict:

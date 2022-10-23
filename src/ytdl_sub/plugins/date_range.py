@@ -56,12 +56,11 @@ class DateRangePlugin(Plugin[DateRangeOptions]):
         """
         ytdl_options_builder = YTDLOptionsBuilder()
 
-        source_date_range = to_date_range(
+        if source_date_range := to_date_range(
             before=self.plugin_options.before,
             after=self.plugin_options.after,
             overrides=self.overrides,
-        )
-        if source_date_range:
+        ):
             ytdl_options_builder.add({"daterange": source_date_range})
 
             # Only add break_on_reject if after is specified, but not before.

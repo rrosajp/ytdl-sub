@@ -12,11 +12,7 @@ from ytdl_sub.utils.logger import Logger
 
 @pytest.fixture
 def expected_uncaught_error_message():
-    return (
-        f"Please upload the error log file '%s' and make a "
-        f"Github issue at https://github.com/jmbannon/ytdl-sub/issues with your config and "
-        f"command/subscription yaml file to reproduce. Thanks for trying ytdl-sub!"
-    )
+    return "Please upload the error log file '%s' and make a Github issue at https://github.com/jmbannon/ytdl-sub/issues with your config and command/subscription yaml file to reproduce. Thanks for trying ytdl-sub!"
 
 
 @pytest.fixture

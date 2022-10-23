@@ -16,11 +16,11 @@ class PrebuiltPresets:
         -------
         Preset names in the set
         """
-        return set(
+        return {
             preset_name
             for preset_name in dir(cls)
             if isinstance(getattr(cls, preset_name), PrebuiltPreset)
-        )
+        }
 
 
 class TvShowByDatePresets(PrebuiltPresets):
