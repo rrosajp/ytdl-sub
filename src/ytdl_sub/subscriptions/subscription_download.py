@@ -190,15 +190,24 @@ class SubscriptionDownload(BaseSubscription, ABC):
         -------
         List of plugins defined in the subscription, initialized and ready to use.
         """
-        plugins = [
-            plugin_type(
+        initialized_plugins: List[Plugin] = []
+        for plugin_type, plugin_options in self.plugins.zipped():
+            plugin = plugin_type(
                 options=plugin_options,
                 overrides=self.overrides,
                 enhanced_download_archive=self.download_archive,
             )
-            for plugin_type, plugin_options in self.plugins.zipped()
-        ]
-        return [plugin for plugin in plugins if plugin.is_enabled]
+            if plugin.is_enabled:
+                initialized_plugins.append(plugin)
+            else:
+                # Set any plugin variables to null if it is disabled
+                for variable_set in plugin_options.added_variables(
+                    unresolved_variables=self.overrides.unresolvable
+                ).values():
+                    nulled_variable_set = {var_name: "" for var_name in variable_set}
+                    self.overrides.add(nulled_variable_set)
+
+        return initialized_plugins
 
     @classmethod
     def _cleanup_entry_files(cls, entry: Entry):
@@ -339,6 +348,10 @@ class SubscriptionDownload(BaseSubscription, ABC):
         self.download_archive.reinitialize(dry_run=dry_run)
 
         plugins = self._initialize_plugins()
+        if not all(plugin.initialize_subscription() for plugin in plugins):
+            # Any plugin that skips gracefully should have logs that explain why
+            logging.info("Skipping %s", self.name)
+            return FileHandlerTransactionLog()
 
         subscription_ytdl_options = SubscriptionYTDLOptions(
             preset=self._preset_options,
