@@ -4,6 +4,7 @@ import mergedeep
 import pytest
 from expected_download import assert_expected_downloads
 from expected_transaction_log import assert_transaction_log_matches
+from resources import DISABLE_YOUTUBE_TESTS
 
 from ytdl_sub.subscriptions.subscription import Subscription
 from ytdl_sub.utils.exceptions import ValidationException
@@ -30,41 +31,34 @@ def yt_album_as_chapters_with_regex_preset_dict(yt_album_as_chapters_preset_dict
     mergedeep.merge(
         yt_album_as_chapters_preset_dict,
         {
-            "regex": {
-                "from": {
-                    # Ensure regex can handle override variables that come from the
-                    # post-metadata stage
-                    "chapter_title": {
-                        "match": r"\d+\. (.+)",
-                        "capture_group_names": "captured_track_title",
-                        "capture_group_defaults": "{chapter_title}",
-                    },
-                    "title": {
-                        "match": [
-                            "(.+) - (.+) [-[\\(\\{].+",
-                            "(.+) - (.+)",
-                        ],
-                        "capture_group_names": [
-                            "captured_track_artist",
-                            "captured_track_album",
-                        ],
-                        "capture_group_defaults": [
-                            "{channel}",
-                            "{title}",
-                        ],
-                    },
-                }
-            },
             "overrides": {
-                "track_title": "{captured_track_title}",
-                "track_album": "{captured_track_album}",
-                "track_artist": "{captured_track_artist}",
+                "title_capture": """{
+                    %regex_capture_many(
+                        title,
+                        [
+                            "(.+) - (.+) [-[\\(\\{].+",
+                            "(.+) - (.+)"
+                        ],
+                        [ channel, title ]
+                    )
+                }""",
+                "chapter_title_capture": r"""{
+                    %regex_capture_many(
+                        chapter_title,
+                        [ "\d+\. (.+)" ],
+                        [ chapter_title ]
+                    )
+                }""",
+                "track_title": "{%array_at(chapter_title_capture, 1)}",
+                "track_artist": "{%array_at(title_capture, 1)}",
+                "track_album": "{%array_at(title_capture, 2)}",
             },
         },
     )
     return yt_album_as_chapters_preset_dict
 
 
+@pytest.mark.skipif(DISABLE_YOUTUBE_TESTS, reason="YouTube tests cannot run in GH")
 class TestSplitByChapters:
     @pytest.mark.parametrize("dry_run", [True, False])
     def test_video_with_chapters(
